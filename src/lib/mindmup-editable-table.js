@@ -90,7 +90,6 @@ $.fn.editableTableWidget = function (options) {
 			}
 		});
 		element.on('click keypress dblclick', showEditor)
-		.css('cursor', 'pointer')
 		.keydown(function (e) {
 			var prevent = true,
 				possibleMove = movement($(e.target), e.which);
@@ -110,7 +109,7 @@ $.fn.editableTableWidget = function (options) {
 			}
 		});
 
-		element.find('td').prop('tabindex', 1);
+		element.find('td.editable').prop('tabindex', 1).css('cursor', 'pointer');
 
 		$(window).on('resize', function () {
 			if (editor.is(':visible')) {
