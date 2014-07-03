@@ -7,14 +7,15 @@ function AvrAsmDbg() {
 AvrAsmDbg.prototype.init = function() {
     this.opcodes = $('#opcodes');
     this.regs = $('#regs');
-    for (var i = 0; i < 10; i++) {
-        $('<tr><td class="editable">&nbsp;</td><td class="editable"></td><td></td><td></td></tr>').appendTo(this.opcodes);
-    }
     for (var i = 0; i < 32; i++) {
         $('<tr><td>' + i + '</td><td class="editable"></td><td class="editable"></td></tr>').appendTo(this.regs);
     }
     $('#opcodes').editableTableWidget();
     $('#regs').editableTableWidget();
+}
+
+AvrAsmDbg.prototype.addCodeLine = function() {
+    $('<tr><td class="editable">&nbsp;</td><td class="editable"></td><td></td><td></td></tr>').appendTo(this.opcodes);
 }
 
 AvrAsmDbg.prototype.populateState = function() {
@@ -37,14 +38,21 @@ AvrAsmDbg.prototype.populateCode = function() {
     var labels = this.avrasm.labels;
     var lines = this.avrasm.lines;
     var rows = this.opcodes.find('tr');
-    var n = rows.size();
-    for (var i = 1; i < n; i++) {
-        var row = $(rows.get(i)).find('td');
-        var label = labels[i - 1];
+    var n = lines.length;
+    if (rows.size() - 1 < n) {
+        var toAdd = n - rows.size() - 1;
+        for (var j = 0; j < toAdd; j++) {
+            this.addCodeLine();
+        }
+        rows = this.opcodes.find('tr');
+    }
+    for (var i = 0; i < n; i++) {
+        var row = $(rows.get(i + 1)).find('td');
+        var label = labels[i];
         if (typeof(label) != 'undefined') {
             $(row.get(0)).text(label + ':');
         }
-        var line = lines[i - 1];
+        var line = lines[i];
         if (typeof(line) != 'undefined') {
             $(row.get(1)).text(line.text);
         }
