@@ -6,12 +6,22 @@ th {
     text-align: center;
 }
 
-#opcodes td:nth-child(-n+2) {
+#opcodes td:nth-child(2), #opcodes td:nth-child(3) {
     padding-left: 5px;
     font-family: monospace;
     font-weight: bold;
 }
 
-#opcodes td:nth-child(n+3) {
+#opcodes td:nth-child(1), #opcodes td:nth-child(4) {
     text-align: center;
+}
+
+.border-rounded {
+    border: 1px solid #aaa;
+    border-radius: 10px;
+    padding: 7px;
+}
+
+.space-before {
+    margin-top: 20px;
 }

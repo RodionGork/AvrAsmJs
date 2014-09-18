@@ -6,7 +6,7 @@ function AvrAsmDbg() {
 
 AvrAsmDbg.prototype.init = function() {
     this.opcodes = $('#opcodes');
-    for (var i = 0; i < 16; i++) {
+    for (var i = 0; i < this.avrasm.lines.length; i++) {
         this.addCodeLine(i);
     }
     this.regs = $('#regs');
@@ -23,7 +23,7 @@ AvrAsmDbg.prototype.addRegsLine = function(i) {
 }
 
 AvrAsmDbg.prototype.addCodeLine = function(i) {
-    $('<tr><td class="editable">&nbsp;</td><td class="editable"></td><td></td><td></td></tr>').appendTo(this.opcodes);
+    $('<tr><td></td><td class="editable">&nbsp;</td><td class="editable"></td><td></td></tr>').appendTo(this.opcodes);
 }
 
 AvrAsmDbg.prototype.populateState = function() {
@@ -48,7 +48,7 @@ AvrAsmDbg.prototype.populateCode = function() {
     var rows = this.opcodes.find('tr');
     var n = lines.length;
     for (var i = 0; i < n; i++) {
-        var row = $(rows.get(i + 1)).find('td');
+        var row = $(rows.get(i + 1)).find('td+td');
         var label = labels[i];
         if (typeof(label) != 'undefined') {
             $(row.get(0)).text(label + ':');
