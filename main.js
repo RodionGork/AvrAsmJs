@@ -15,7 +15,9 @@ AvrAsmDbg.prototype.init = function() {
     }
     $('#opcodes').editableTableWidget();
     $('#regs').editableTableWidget();
-    $('#regs td').change(this.regsEdit);
+    var self = this;
+    $('#regs td').change(function() {self.regsEdit(this)});
+    $('#opcodes td').change(function() {self.codeEdit(this)});
 }
 
 AvrAsmDbg.prototype.addRegsLine = function(i) {
@@ -69,25 +71,43 @@ $(function() {
     avrAsmDbg = new AvrAsmDbg();
 });
 
-AvrAsmDbg.prototype.regsEdit = function() {
-    var $this = $(this);
-    var $tr = $this.parent();
-    var row = $tr.parent().children().index($tr) - 1;
-    var col = $tr.children().index($this);
+AvrAsmDbg.prototype.cellCoords = function(cell) {
+    var $tr = cell.parent();
+    return {
+        y: $tr.parent().children().index($tr) - 1,
+        x: $tr.children().index(cell)};
+}
+
+AvrAsmDbg.prototype.regsEdit = function(cell) {
+    cell = $(cell);
+    var pos = this.cellCoords(cell);
     var base, $hex, $dec;
-    if (col == 1) {
+    if (pos.x == 1) {
         base = 16;
-        $hex = $this;
-        $dec = $this.next();
+        $hex = cell;
+        $dec = cell.next();
     } else {
         base = 10;
-        $hex = $this.prev();
-        $dec = $this;
+        $hex = cell.prev();
+        $dec = cell;
     }
-    var val = parseInt($this.text(), base);
+    var val = parseInt(cell.text(), base);
     if (isNaN(val) || val < 0 || val > 255) {
         val = 0;
     }
     $dec.text(val.toString());
     $hex.text(('00' + val.toString(16) + 'h').substr(-3));
+    this.avrasm.regs[pos.y] = val;
+}
+
+AvrAsmDbg.prototype.codeEdit = function(cell) {
+    cell = $(cell);
+    var pos = this.cellCoords(cell);
+    if (pos.x == 1) {
+        var labelName = cell.text();
+        labelName = labelName.replace(/\:$/, '');
+        this.avrasm.label(labelName, pos.y);
+        cell.text(labelName + ':');
+        return;
+    }
 }

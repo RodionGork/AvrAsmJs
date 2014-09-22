@@ -39,7 +39,7 @@ AvrAsm.prototype.addCommand = function(cmd) {
     return {text: cmd, hex: 0, size: cmdData.size};
 }
 
-AvrAsm.prototype.label = function(name, line) {
-    this.labels[name] = line;
-    this.labels[line] = name;
+AvrAsm.prototype.label = function(labelName, line) {
+    this.labels[labelName] = line;
+    this.labels[line] = labelName;
 }
