@@ -1,5 +1,8 @@
 function AvrAsmDbg() {
     this.avrasm = new AvrAsm();
+    var cmds = new AvrCmds(this.avrasm);
+    this.avrasm.cmds = cmds;
+    this.avrasm.init();
     this.init();
     this.populateState();
 }
@@ -104,10 +107,31 @@ AvrAsmDbg.prototype.codeEdit = function(cell) {
     cell = $(cell);
     var pos = this.cellCoords(cell);
     if (pos.x == 1) {
-        var labelName = cell.text();
-        labelName = labelName.replace(/\:$/, '');
-        this.avrasm.label(labelName, pos.y);
-        cell.text(labelName + ':');
+        this.labelEdit(cell, pos);
+    } else {
+        this.commandEdit(cell, pos);
+    }
+}
+
+AvrAsmDbg.prototype.commandEdit = function(cell, pos) {
+    var command = cell.text();
+    try {
+        var parsed = this.avrasm.parseCommand(command);
+        this.avrasm.lines[pos.y] = parsed;
+        cell.text(parsed.text);
+    } catch (e) {
+        cell.text(this.avrasm.lines[pos.y].text);
+        console.log(e);
+    }
+}
+
+AvrAsmDbg.prototype.labelEdit = function(cell, pos) {
+    var labelName = cell.text();
+    labelName = labelName.replace(/\:$/, '');
+    if (!/^[A-Za-z\_][A-Za-z0-9\_]*$/.test(labelName)) {
+        cell.text(this.avrasm.label(pos.y));
         return;
     }
+    this.avrasm.label(labelName, pos.y);
+    cell.text(labelName + ':');
 }

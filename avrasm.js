@@ -2,8 +2,6 @@ function AvrAsm() {
     this.lines = [];
     this.labels = [];
     this.regs = [];
-    
-    this.init();
 }
 
 AvrAsm.prototype.init = function() {
@@ -12,9 +10,9 @@ AvrAsm.prototype.init = function() {
         this.regs[i] = 0;
     }
     this.label('main', 0);
-    this.lines[0] = this.addCommand('rjmp main');
+    this.lines[0] = this.parseCommand('rjmp main');
     for (var j = 1; j < 10; j++) {
-        this.lines[j] = this.addCommand('nop');
+        this.lines[j] = this.parseCommand('nop');
     }
 }
 
@@ -29,17 +27,25 @@ AvrAsm.prototype.loadCommandsData = function() {
     };
 }
 
-AvrAsm.prototype.addCommand = function(cmd) {
+AvrAsm.prototype.parseCommand = function(cmd) {
     cmd = cmd.trim().toLowerCase();
-    var type = cmd.split(' ')[0];
-    var cmdData = this.commands[type];
-    if (typeof(cmdData) == 'undefined') {
+    var splitted = cmd.split(/\s+/, 2);
+    var type = splitted[0];
+    var parser = this.cmds[type];
+    if (typeof(parser) == 'undefined') {
         throw 'Unknown opcode: ' + type;
     }
-    return {text: cmd, hex: 0, size: cmdData.size};
+    return this.cmds[type](splitted[1]);
 }
 
 AvrAsm.prototype.label = function(labelName, line) {
+    if (typeof(line) == 'undefined') {
+        if (typeof(this.labels[labelName]) != 'undefined') {
+            return this.labels[labelName];
+        } else {
+            return typeof(labelName) == 'number' ? '' : -1;
+        }
+    }
     this.labels[labelName] = line;
     this.labels[line] = labelName;
 }
